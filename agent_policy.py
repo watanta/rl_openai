@@ -634,13 +634,22 @@ class AgentPolicy(Agent):
         # Tiny reward for research to help. Up to 0.5 reward for this.
         rewards["rew/r_research"] = (research - self.research_last) / (200 * 2)
         self.research_last = research
-        
+
+        # Give a reward accoring to the number of city tiles more than your opponent
+        rewards["rew/r_city_tiles_more_opponent"] = 0
+        rewards["rew/r_city_tiles_more_opponent"] = (city_tile_count_opponent - city_tile_count) * 0.5
+
         # Give a reward up to around 50.0 based on number of city tiles at the end of the game
         rewards["rew/r_city_tiles_end"] = 0
         if is_game_finished:
             self.is_last_turn = True
             rewards["rew/r_city_tiles_end"] = city_tile_count
-        
+
+        # Give a big reward if you win!
+        rewards["rew/r_win"] = 0
+        if is_game_finished and (city_tile_count_opponent > city_tile_count):
+            self.is_last_turn = True
+            rewards["rew/r_win"] = 10.0
         
         # Update the stats and total reward
         reward = 0
