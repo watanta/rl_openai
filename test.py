@@ -25,16 +25,20 @@ import agent_policy
 # reload(agent_policy) # Reload the file from disk incase the above agent-writing cell block was edited
 from agent_policy import AgentPolicy
 
-from luxai2021.env.agent import Agent
+from luxai2021.env.agent import Agent, AgentWithModel
 from luxai2021.env.lux_env import LuxEnvironment
 from luxai2021.game.constants import LuxMatchConfigs_Default
 
+import torch
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device
+print(device)
 
 # Default Lux configs
 configs = LuxMatchConfigs_Default
 
 # Create a default opponent agent
-opponent = Agent()
+opponent = AgentWithModel(model="./opponent_model.zip")
 
 # Create a RL agent in training mode
 player = AgentPolicy(mode="train")
