@@ -521,6 +521,8 @@ class AgentPolicy(Agent):
             "rew/r_fuel_collected":0,
             "rew/r_units":0,
             "rew/r_city_tiles":0,
+            "rew/r_city_tiles_more_opponent":0,
+            "rew/r_win":0,
             "game/turns": 0,
             "game/research": 0,
             "game/unit_count": 0,
@@ -636,7 +638,6 @@ class AgentPolicy(Agent):
         self.research_last = research
 
         # Give a reward accoring to the number of city tiles more than your opponent
-        rewards["rew/r_city_tiles_more_opponent"] = 0
         rewards["rew/r_city_tiles_more_opponent"] = (city_tile_count_opponent - city_tile_count) * 0.5
 
         # Give a reward up to around 50.0 based on number of city tiles at the end of the game
