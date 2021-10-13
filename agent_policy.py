@@ -596,7 +596,7 @@ class AgentPolicy(Agent):
                         if unit_count < city_tile_count: 
                             actions.append(SpawnWorkerAction(
                                     game=game,
-                                    unit_id=unit.id if unit else None,
+                                    unit_id=None,
                                     unit=unit,
                                     city_id=city_tile.city_id if city_tile else None,
                                     citytile=city_tile,
@@ -608,7 +608,7 @@ class AgentPolicy(Agent):
                         elif not researched_uranium:
                             actions.append(ResearchAction(
                                 game=game,
-                                unit_id=unit.id if unit else None,
+                                unit_id=None,
                                 unit=unit,
                                 city_id=city_tile.city_id if city_tile else None,
                                 citytile=city_tile,
