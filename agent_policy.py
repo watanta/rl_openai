@@ -171,7 +171,7 @@ class AgentPolicy(Agent):
         #   1x research points [cur player]
         #   1x researched coal [cur player]
         #   1x researched uranium [cur player]
-        self.observation_shape = (22, 32, 32)
+        self.observation_shape = (20, 32, 32)
         self.observation_space = spaces.Box(low=0, high=1, shape=
         self.observation_shape, dtype=np.float16)
 
@@ -206,14 +206,6 @@ class AgentPolicy(Agent):
             b[:2, x, y] = (
                 1,
                 (unit.cargo["wood"] + unit.cargo["coal"] + unit.cargo["uranium"]) / 100
-            )
-        # if input is city_tile
-        if city_tile is not None:
-            x = city_tile.pos.x + x_shift
-            y = city_tile.pos.y + y_shift
-            # upkeep = min(city.fuel / city.lightupkeep(), 10) / 10 所属cityの取得の仕方がわからない
-            b[21:22, x, y] = (
-                1
             )
 
         # Units
