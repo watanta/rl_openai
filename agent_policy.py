@@ -121,22 +121,16 @@ class AgentPolicy(Agent):
         # They must be gym.spaces objects
         # Example when using discrete actions:
         self.actionSpaceMapUnits = [
-            partial(MoveAction, direction=Constants.DIRECTIONS.CENTER),  # This is the do-nothing action
             partial(MoveAction, direction=Constants.DIRECTIONS.NORTH),
             partial(MoveAction, direction=Constants.DIRECTIONS.WEST),
             partial(MoveAction, direction=Constants.DIRECTIONS.SOUTH),
             partial(MoveAction, direction=Constants.DIRECTIONS.EAST),
-            smart_transfer_to_nearby, # Transfer to nearby
             SpawnCityAction,
             #PillageAction,
         ]
-        self.actionSpaceMapCities = [
-            SpawnWorkerAction,
-            SpawnCartAction,
-            ResearchAction,
-        ]
 
-        self.action_space = spaces.Discrete(max(len(self.actionSpaceMapUnits), len(self.actionSpaceMapCities)))
+
+        self.action_space = spaces.Discrete(len(self.actionSpaceMapUnits))
         
 
         # Observation space: (Basic minimum for a miner agent)
@@ -343,8 +337,47 @@ class AgentPolicy(Agent):
         Takes an action in the environment according to actionCode:
             actionCode: Index of action to take into the action array.
         """
-        action = self.action_code_to_action(action_code, game, unit, city_tile, team)
-        self.match_controller.take_action(action)
+        if city_tile is None:
+            action = self.action_code_to_action(action_code, game, unit, city_tile, team)
+            self.match_controller.take_action(action)
+        else:
+            unit_count = len(game.state["teamStates"][0]["units"])
+            rp = game.state["teamStates"][team]["researchPoints"]
+            researched_uranium = False
+            if rp >= 200:
+                researched_uranium = True
+            city_tile_count = 0
+            for tmp_city_tile in game.cities:
+                if game.cities[tmp_city_tile].team == team:
+                    city_tile_count += 1
+            x = city_tile.pos.x
+            y = city_tile.pos.y
+            if unit_count < city_tile_count: 
+                # action = city_tile.build_worker()
+                action = SpawnWorkerAction(
+                    game=game,
+                    unit_id=unit.id if unit else None,
+                    unit=unit,
+                    city_id=city_tile.city_id if city_tile else None,
+                    citytile=city_tile,
+                    team=team,
+                    x=x,
+                    y=y
+                )
+                pass
+            elif not researched_uranium:
+                action = ResearchAction(
+                                game=game,
+                                unit_id=unit.id if unit else None,
+                                unit=unit,
+                                city_id=city_tile.city_id if city_tile else None,
+                                citytile=city_tile,
+                                team=team,
+                                x=x,
+                                y=y
+                            )
+            self.match_controller.take_action(action)
+
     
     def game_start(self, game):
         """
@@ -541,18 +574,21 @@ class AgentPolicy(Agent):
                 new_turn = False
 
         # Inference the model per-city
+        unit_count = len(player.units)
         cities = game.cities.values()
         for city in cities:
             if city.team == team:
                 for cell in city.city_cells:
                     city_tile = cell.city_tile
                     if city_tile.can_act():
-                        obs = self.get_observation(game, None, city_tile, city.team, new_turn)
-                        action_code, _states = self.model.predict(obs, deterministic=False)
-                        if action_code is not None:
-                            actions.append(
-                                self.action_code_to_action(action_code, game=game, unit=None, city_tile=city_tile,
-                                                           team=city.team))
+                        # obs = self.get_observation(game, None, city_tile, city.team, new_turn)
+                        # action_code, _states = self.model.predict(obs, deterministic=False)
+                        if unit_count < player.city_tile_count: 
+                            actions.append(city_tile.build_worker())
+                            unit_count += 1
+                        elif not player.researched_uranium():
+                            actions.append(city_tile.research())
+                            player.research_points += 1
                         new_turn = False
 
         time_taken = time.time() - start_time
