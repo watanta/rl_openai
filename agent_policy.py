@@ -240,23 +240,24 @@ class AgentPolicy(Agent):
                 )
 
         # Resources
-        for wood_tile in game.map.resources_by_type["wood"]:
-            x = wood_tile.pos.x + x_shift
-            y = wood_tile.pos.y + y_shift
-            amt = wood_tile.resource.amount
-            b[12, x, y] = amt / 800
-
-        for coal_tile in game.map.resources_by_type["coal"]:
-            x = coal_tile.pos.x + x_shift
-            y = coal_tile.pos.y + y_shift
-            amt = coal_tile.resource.amount
-            b[13, x, y] = amt / 800
-
-        for uranium_tile in game.map.resources_by_type["uranium"]:
-            x = uranium_tile.pos.x + x_shift
-            y = uranium_tile.pos.y + y_shift
-            amt = uranium_tile.resource.amount
-            b[14, x, y] = amt / 800
+        if "wood" in game.map.resources_by_type:
+            for wood_tile in game.map.resources_by_type["wood"]:
+                x = wood_tile.pos.x + x_shift
+                y = wood_tile.pos.y + y_shift
+                amt = wood_tile.resource.amount
+                b[12, x, y] = amt / 800
+        if "coal" in game.map.resources_by_type:
+            for coal_tile in game.map.resources_by_type["coal"]:
+                x = coal_tile.pos.x + x_shift
+                y = coal_tile.pos.y + y_shift
+                amt = coal_tile.resource.amount
+                b[13, x, y] = amt / 800
+        if "uranium" in game.map.resources_by_type:
+            for uranium_tile in game.map.resources_by_type["uranium"]:
+                x = uranium_tile.pos.x + x_shift
+                y = uranium_tile.pos.y + y_shift
+                amt = uranium_tile.resource.amount
+                b[14, x, y] = amt / 800
         
         # Resource point
         for team in game.state["teamStates"]:
