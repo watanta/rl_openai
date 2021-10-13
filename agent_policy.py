@@ -196,7 +196,7 @@ class AgentPolicy(Agent):
         y_shift = (32 - height) // 2
         cities = {}
 
-        b = np.zeros((22, 32, 32), dtype=np.float16)
+        b = np.zeros((20, 32, 32), dtype=np.float16)
 
         # input ownself
         # if input is unit
