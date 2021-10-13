@@ -354,7 +354,6 @@ class AgentPolicy(Agent):
             x = city_tile.pos.x
             y = city_tile.pos.y
             if unit_count < city_tile_count: 
-                # action = city_tile.build_worker()
                 action = SpawnWorkerAction(
                     game=game,
                     unit_id=unit.id if unit else None,
@@ -575,21 +574,49 @@ class AgentPolicy(Agent):
                 new_turn = False
 
         # Inference the model per-city
-        unit_count = len(player.units)
+        unit_count = len(game.state["teamStates"][0]["units"])
+        rp = game.state["teamStates"][team]["researchPoints"]
+        researched_uranium = False
+        city_tile_count = 0
+        for tmp_city_tile in game.cities:
+            if game.cities[tmp_city_tile].team == team:
+                city_tile_count += 1
         cities = game.cities.values()
         for city in cities:
             if city.team == team:
                 for cell in city.city_cells:
                     city_tile = cell.city_tile
+                    x = city_tile.pos.x
+                    y = city_tile.pos.y
+                    if rp >= 200:
+                        researched_uranium = True
                     if city_tile.can_act():
                         # obs = self.get_observation(game, None, city_tile, city.team, new_turn)
                         # action_code, _states = self.model.predict(obs, deterministic=False)
-                        if unit_count < player.city_tile_count: 
-                            actions.append(city_tile.build_worker())
+                        if unit_count < city_tile_count: 
+                            actions.append(SpawnWorkerAction(
+                                    game=game,
+                                    unit_id=unit.id if unit else None,
+                                    unit=unit,
+                                    city_id=city_tile.city_id if city_tile else None,
+                                    citytile=city_tile,
+                                    team=team,
+                                    x=x,
+                                    y=y
+                                ))
                             unit_count += 1
-                        elif not player.researched_uranium():
-                            actions.append(city_tile.research())
-                            player.research_points += 1
+                        elif not researched_uranium:
+                            actions.append(ResearchAction(
+                                game=game,
+                                unit_id=unit.id if unit else None,
+                                unit=unit,
+                                city_id=city_tile.city_id if city_tile else None,
+                                citytile=city_tile,
+                                team=team,
+                                x=x,
+                                y=y
+                            ))
+                            rp += 1
                         new_turn = False
 
         time_taken = time.time() - start_time
