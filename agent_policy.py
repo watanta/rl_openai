@@ -345,7 +345,7 @@ class AgentPolicy(Agent):
                     city_tile_count += 1
             x = city_tile.pos.x
             y = city_tile.pos.y
-            if unit_count < city_tile_count: 
+            if unit_count < city_tile_count or researched_uranium: 
                 action = SpawnWorkerAction(
                     game=game,
                     unit_id=unit.id if unit else None,
@@ -356,7 +356,6 @@ class AgentPolicy(Agent):
                     x=x,
                     y=y
                 )
-                pass
             elif not researched_uranium:
                 action = ResearchAction(
                                 game=game,
@@ -585,11 +584,11 @@ class AgentPolicy(Agent):
                     if city_tile.can_act():
                         # obs = self.get_observation(game, None, city_tile, city.team, new_turn)
                         # action_code, _states = self.model.predict(obs, deterministic=False)
-                        if unit_count < city_tile_count: 
+                        if unit_count < city_tile_count or researched_uranium: 
                             actions.append(SpawnWorkerAction(
                                     game=game,
                                     unit_id=None,
-                                    unit=unit,
+                                    unit=None,
                                     city_id=city_tile.city_id if city_tile else None,
                                     citytile=city_tile,
                                     team=team,
@@ -601,7 +600,7 @@ class AgentPolicy(Agent):
                             actions.append(ResearchAction(
                                 game=game,
                                 unit_id=None,
-                                unit=unit,
+                                unit=None,
                                 city_id=city_tile.city_id if city_tile else None,
                                 citytile=city_tile,
                                 team=team,
