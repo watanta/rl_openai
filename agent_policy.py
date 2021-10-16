@@ -394,7 +394,7 @@ class AgentPolicy(Agent):
             "rew/r_fuel_collected":0,
             "rew/r_units":0,
             "rew/r_city_tiles":0,
-#             "rew/r_win":0,
+            "rew/r_win":0,
 #             "rew/r_city_tiles_more_opponent":0,
             "game/turns": 0,
             "game/research": 0,
@@ -519,11 +519,11 @@ class AgentPolicy(Agent):
             self.is_last_turn = True
             rewards["rew/r_city_tiles_end"] = city_tile_count
 
-#         # Give a big reward if you win!
-#         rewards["rew/r_win"] = 0
-#         if is_game_finished and (city_tile_count_opponent > city_tile_count):
-#             self.is_last_turn = True
-#             rewards["rew/r_win"] = 10.0
+        # Give a big reward if you win!
+        rewards["rew/r_win"] = 0
+        if is_game_finished and (city_tile_count_opponent > city_tile_count):
+            self.is_last_turn = True
+            rewards["rew/r_win"] = 10.0
         
         # Update the stats and total reward
         reward = 0
